@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Memory Game</title>
+    <style type="text/css">
+      div#memory_board {
+        background: #CCC;
+        border: 1px solid #999;
+        width: 800px;
+        height: 540px;
+        padding: 24px;
+        margin: 0px auto;
+      }
+      div#memory_board > div {
+        background: url(https://www.iconsdb.com/icons/preview/blue/square-xxl.png) no-repeat;
+        border: 1px solid #000;
+        width: 71px;
+        height: 71px;
+        float: left;
+        margin: 10px;
+        padding: 20px;
+        font-size: 64px;
+        cursor: pointer;
+        text-align: center;
+      }
+    </style>
+    <script>
+      var memory_array = ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E', 'F', 'F', 'G', 'G', 'H', 'H', 'I', 'I', 'J', 'J', 'K', 'K', 'L', 'L',];
+      var memory_values = [];
+      var memory_tile_ids = [];
+      var tiles_flipped = 0;
+      
+      // Shuffle array method which overwrites your memory_array with one that is shuffled,
+      // the prototype property adds it to all Array objects
+        Array.prototype.memory_tile_shuffle = function () {
+            var i, j, temp;
+            for (i = this.length - 1; i > 0; i--) {
+                j = Math.floor(Math.random() * (i+1)); // j is a random integer such that 0 ≤ j ≤ i
+                // exchange a[j] and a[i]
+                temp = this[j]; 
+                this[j] = this[i];
+                this[i] = temp;
+            }
+        }
+
+      
+      // function to generate a new board
+        function newBoard(){
+            tiles_flipped = 0;
+            var output = '';
+            memory_array.memory_tile_shuffle();
+            for (var i=0; i < memory_array.length; i++) {
+                output += '<div id="tile_' + i + '" onclick="memoryFlipTile(this,\'' + memory_array[i] + '\')"></div>';
+                // example: <div id="tile_0" onclick="memoryFlipTile(this, A)"></div> // the 'this' here represents the div 'object' being accessed
+            }
+            document.getElementById('memory_board').innerHTML = output;
+        }
+
+
+      // Each card, when clicked runs the memoryFliptile function
+        function memoryFlipTile(tile, val) {
+            if (tile.innerHTML == "" && memory_values.length < 2) {
+                tile.style.background = '#FFF';
+                tile.innerHTML = val;
+                if (memory_values.length == 0) {
+                    memory_values.push(val);
+                    memory_tile_ids.push(tile.id);
+                } else if (memory_values.length == 1) {
+                    memory_values.push(val);
+                    memory_tile_ids.push(tile.id);
+                    if (memory_values[0] == memory_values[1]) {
+                        tiles_flipped += 2;
+                        // Clear both arrays
+                        memory_values = [];
+                        memory_tile_ids = [];
+                        // Check to see if the whole board is cleared
+                        if (tiles_flipped == memory_array.length) {
+                            alert("Board cleared... generating new board");
+                            document.getElementById('memory_board').innerHTML = "";
+                            newBoard();
+                        }
+                    } else {
+                        function flip2Back() {
+                            // Flip the 2 tiles back over
+                            var tile_1 = document.getElementById(memory_tile_ids[0]);
+                            var tile_2 = document.getElementById(memory_tile_ids[1]);
+                            tile_1.style.background = 'url(https://www.iconsdb.com/icons/preview/blue/square-xxl.png) no-repeat';
+                            tile_1.innerHTML = "";
+                            tile_2.style.background = 'url(https://www.iconsdb.com/icons/preview/blue/square-xxl.png) no-repeat';
+                            tile_2.innerHTML = "";
+                            // Clear both arrays
+                            memory_values = [];
+                            memory_tile_ids = [];
+                        }
+                        setTimeout(flip2Back, 700);
+                    }
+                }
+            }
+        }
+
+
+
+      // 3 ways to run newBoard when window is loaded;
+        // window.addEventListener("load", newBoard);
+        // window.addEventListener("load", function() {
+        //   newBoard()
+        // }, false);
+        // window.onload = function() {
+        //   newBoard()
+        // };
+
+
+    </script>
+  </head>
+  <body>
+    <div id="memory_board"></div>
+
+    <!-- This will make newBoard() run when page loads; or you can use window load event in your head tags -->
+    <script>newBoard();</script>
+  </body>
+</html>
